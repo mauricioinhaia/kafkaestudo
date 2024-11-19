@@ -17,7 +17,7 @@ public class NewOrderMain {
         var value = "0001,65423,700000";
         var record = new ProducerRecord<>("ECOMMERCE_NEWORDER", value, value);
         producer.send(record, (data, exception) -> {
-            if(Objects.nonNull(exception)) {
+            if (Objects.nonNull(exception)) {
                 exception.printStackTrace();
                 return;
             }
