@@ -26,15 +26,26 @@ public class NewOrderMain {
                     + "/ offset " + data.offset()
                     + "/ timestamp " + data.timestamp());
         };
-        var producer = new KafkaProducer<String, String>(properties());
-        var userId = UUID.randomUUID().toString();
-        var value = userId + ",65423,700000";
-        var record = new ProducerRecord<>("ECOMMERCE_NEWORDER", userId, value);
-        producer.send(record, callback).get();
+       var producer = new KafkaProducer<String, String>(properties());
+//        var userId = UUID.randomUUID().toString();
+//        var value = userId + ",65423,700000";
+//        var record = new ProducerRecord<>("ECOMMERCE_NEWORDER", userId, value);
+//        producer.send(record, callback).get();
+//
+//        var email = "Thank You! We are processing your order!";
+//        var emailRecord = new ProducerRecord<>("ECOMMERCE_SENDEMAIL", userId, email);
+//        producer.send(emailRecord, callback).get();
 
-        var email = "Thank You! We are processing your order!";
-        var emailRecord = new ProducerRecord<>("ECOMMERCE_SENDEMAIL", userId, email);
-        producer.send(emailRecord, callback).get();
+        for (int i = 0; i < 100; i++) {
+            var userId = UUID.randomUUID().toString();
+            var value = userId + ",65423,700000";
+            var record = new ProducerRecord<>("ECOMMERCE_NEWORDER", userId, value);
+            producer.send(record, callback).get();
+
+            var email = "Thank You! We are processing your order!";
+            var emailRecord = new ProducerRecord<>("ECOMMERCE_SENDEMAIL", userId, email);
+            producer.send(emailRecord, callback).get(); // Envia o email para Kafka e aguarda a resposta
+        }
     }
 
     private static Properties properties() {
