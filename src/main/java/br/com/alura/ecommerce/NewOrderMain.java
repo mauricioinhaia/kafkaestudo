@@ -1,5 +1,6 @@
 package br.com.alura.ecommerce;
 
+import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -13,10 +14,7 @@ import java.util.concurrent.ExecutionException;
 public class NewOrderMain {
 
     public static void main(String[] args) throws ExecutionException, InterruptedException {
-        var producer = new KafkaProducer<String, String>(properties());
-        var value = "0001,65423,700000";
-        var record = new ProducerRecord<>("ECOMMERCE_NEWORDER", value, value);
-        producer.send(record, (data, exception) -> {
+        Callback callback = (data, exception) -> {
             if (Objects.nonNull(exception)) {
                 exception.printStackTrace();
                 return;
@@ -26,7 +24,15 @@ public class NewOrderMain {
                     + ":::partition " + data.partition()
                     + "/ offset " + data.offset()
                     + "/ timestamp " + data.timestamp());
-        }).get();
+        };
+        var producer = new KafkaProducer<String, String>(properties());
+        var value = "0001,65423,700000";
+        var record = new ProducerRecord<>("ECOMMERCE_NEWORDER", value, value);
+        producer.send(record, callback).get();
+
+        var email = "Thank You! We are processing your order!";
+        var emailRecord = new ProducerRecord<>("ECOMMERCE_SENDEMAIL", email, email);
+        producer.send(emailRecord, callback).get();
     }
 
     private static Properties properties() {
